@@ -1,0 +1,32 @@
+import requests
+import sqlite3
+import os
+import pandas as pd
+from collections import defaultdict
+
+# Variables initiales
+
+n_lignes = 1500 # 1 jour ~ 100 lignes
+lignes_req = 20
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "../data/raw_data.db")
+
+api_request_string = "https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records?order_by=date_heure%20DESC&limit={}&offset={}"
+
+# requete API 
+
+returns = []
+for offset in range(0, n_lignes, lignes_req):
+    r = requests.request("GET", api_request_string.format(lignes_req, offset)).json()
+    returns.extend(r["results"])
+
+
+df = pd.DataFrame(returns)
+
+# stockage dans la base de données sqlite3
+
+conn = sqlite3.connect(DB_PATH)
+df.to_sql(name="raw_data",con=conn, if_exists="replace", index=False)
+conn.close()
+
