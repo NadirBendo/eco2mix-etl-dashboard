@@ -2,7 +2,6 @@ import requests
 import sqlite3
 import os
 import pandas as pd
-from collections import defaultdict
 
 # Variables initiales
 
@@ -11,8 +10,9 @@ lignes_req = 20
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "../data/raw_data.db")
+local_dump = True
 
-api_request_string = "https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records?order_by=date_heure%20DESC&limit={}&offset={}"
+api_request_string = "https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records?where=date_heure%20%3C%3D%20now(days%3D-1)&order_by=date_heure%20DESC&limit={}&offset={}"
 
 # requete API 
 
@@ -26,7 +26,13 @@ df = pd.DataFrame(returns)
 
 # stockage dans la base de données sqlite3
 
-conn = sqlite3.connect(DB_PATH)
-df.to_sql(name="raw_data",con=conn, if_exists="replace", index=False)
-conn.close()
+with sqlite3.connect(DB_PATH) as conn:
+    df.to_sql(name="raw_data",con=conn, if_exists="replace", index=False)
 
+    curr = conn.cursor()
+    curr.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_date_heure ON raw_data(date_heure);")
+    curr.close()
+
+
+if local_dump:
+    df.to_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/dump.csv"))
