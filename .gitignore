@@ -1,2 +1,4 @@
 data/*.db
 data/*.csv
+*.json
+pipeline/.env
