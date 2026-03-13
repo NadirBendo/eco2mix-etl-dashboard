@@ -27,7 +27,7 @@ client = gspread.authorize(creds)
 sheet = client.open_by_key(os.environ["SHEET_ID"]).sheet1
 
 time_col = sheet.col_values(5)  # liste de valeurs
-max_date = max(time_col[1:])  # on skip le header
+max_date = max([str(t) for t in time_col[1:]])  # on skip le header
 
 print(f"date max dans la feuille : {max_date}")
 
@@ -41,7 +41,8 @@ with sqlite3.connect(DB_PATH) as conn:
     cols = [r[1] for r in curr.fetchall()]
     useful_cols = [c for c in cols if c not in ["prevision_j1", "prevision_j"]]
 
-    db_query = f"SELECT {','.join(useful_cols)} FROM raw_data WHERE consommation IS NOT NULL AND datetime(\"{max_date}\") <= date_heure;"
+    db_query = f"SELECT {','.join(useful_cols)} FROM raw_data WHERE consommation IS NOT NULL AND datetime(\"{max_date}\") < datetime(date_heure) ORDER BY date_heure ASC;"
+
     curr.execute(db_query)
     rows = curr.fetchall()
     

@@ -9,8 +9,8 @@ import gspread
 
 # Variables initiales
 
-n_lignes = 1500 # 1 jour ~ 100 lignes
-lignes_req = 20
+n_lignes = 8000 # 1 jour ~ 100 lignes
+lignes_req = 80
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -26,6 +26,10 @@ api_request_string = "https://odre.opendatasoft.com/api/explore/v2.1/catalog/dat
 returns = []
 for offset in range(0, n_lignes, lignes_req):
     r = requests.request("GET", api_request_string.format(lignes_req, offset)).json()
+    if ("results" not in r) or len(r["results"]) == 0:
+        print(f"Limite atteinte (réponse API ou résultat nul)")
+        break
+
     returns.extend(r["results"])
 
 
@@ -39,26 +43,26 @@ with sqlite3.connect(DB_PATH) as conn:
     curr = conn.cursor()
     curr.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_date_heure ON raw_data(date_heure);")
 
+
+    # Stockage des données propres dans le google sheet
+    useful_cols = [c for c in df.columns if c not in ["prevision_j1", "prevision_j"]]
+
+    db_query = f"SELECT {','.join(useful_cols)} FROM raw_data WHERE consommation IS NOT NULL;"
+
+    curr.execute(db_query)
+
+    useful_data = curr.fetchall()
+
+    scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+
+    creds = Credentials.from_service_account_file(os.path.join(BASE_DIR, os.environ["GCP_TOKEN"]), scopes = scopes)
+    client = gspread.authorize(creds)
+    sheet = client.open_by_key(os.environ["SHEET_ID"]).sheet1
+
+    sheet.append_row(useful_cols)
+    sheet.append_rows(useful_data)
+
     curr.close()
-
-# Stockage des données propres dans le google sheet
-useful_cols = [c for c in df.columns if c not in ["prevision_j1", "prevision_j"]]
-
-real_rows = df[pd.isnull(df["consommation"]) == False]
-
-useful_data = real_rows[useful_cols]
-
-scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-
-creds = Credentials.from_service_account_file(os.path.join(BASE_DIR, os.environ["GCP_TOKEN"]), scopes = scopes)
-client = gspread.authorize(creds)
-sheet = client.open_by_key(os.environ["SHEET_ID"]).sheet1
-
-sheet.append_row(useful_cols)
-
-sheet.append_rows(useful_data.to_numpy().tolist())
-
-
 
 if local_dump:
     df.to_csv(os.path.join(BASE_DIR, "../data/dump.csv"), index=False)
