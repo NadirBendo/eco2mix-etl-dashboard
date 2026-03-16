@@ -1,4 +1,4 @@
-# eCO2mix — ETL Dashboard Production Électrique Nationale
+# eCO2mix - ETL Dashboard Production Électrique Nationale
 
 > Pipeline de données temps réel depuis l'API RTE eCO2mix, avec stockage local SQLite, upload incrémental vers Google Sheets et visualisation via Power BI.
 
