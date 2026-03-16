@@ -71,7 +71,7 @@ Upload incrémental vers Google Sheets. Récupère le timestamp maximum déjà p
 ## Choix techniques notables
 
 **Modèle de données plat (flat model)**
-Source unique et homogène — pas de justification à normaliser. Un modèle plat avec une table de dates dédiée est suffisant et plus performant pour ce cas d'usage.
+Source unique et homogène : pas de justification à normaliser. Un modèle plat avec une table de dates dédiée est suffisant et plus performant pour ce cas d'usage.
 
 **Déduplication via index unique SQLite**
 La clé d'unicité sur `date_heure` garantit l'idempotence des insertions sans logique applicative complexe.
@@ -81,18 +81,18 @@ Les colonnes d'échanges par pays (une colonne par pays dans la source) sont dé
 
 ---
 
-## Dashboard Power BI — Aperçu
+## Dashboard Power BI - Aperçu
 
-### Page 1 — Vue d'ensemble
+### Page 1 - Vue d'ensemble
 KPIs globaux (part nucléaire, consommation moyenne, tonnes CO₂ produites), évolution de la consommation vs production nucléaire, mix de production en donut, échanges aux frontières, profil de consommation journalier moyen.
 
-### Page 2 — Production Électrique
+### Page 2 - Production Électrique
 Évolution du mix de production à 100% dans le temps, décomposition journalière moyenne par filière, variation du stock hydraulique STEP.
 
-### Page 3 — Énergies Renouvelables
+### Page 3 - Énergies Renouvelables
 Répartition Renouvelable / Nucléaire / Fossile, décomposition hydraulique et bioénergies, part éolien terrestre vs offshore, corrélation part renouvelable / intensité carbone (gCO₂/kWh).
 
-### Page 4 — Échanges Transfrontaliers
+### Page 4 - Échanges Transfrontaliers
 Top partenaires (import/export/volume), part des échanges dans la consommation nationale, évolution du volume d'échanges, profil journalier par pays, répartition du volume par pays.
 
 ---
@@ -118,7 +118,7 @@ Top partenaires (import/export/volume), part des échanges dans la consommation 
 
 ## Données
 
-Source : [API eCO2mix nationale temps réel — ODRE / RTE](https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/)  
+Source : [API eCO2mix nationale temps réel](https://odre.opendatasoft.com/explore/dataset/eco2mix-national-tr/)  
 Périmètre : France entière  
 Granularité : 15 min (consommation) / 30 min (production, échanges)  
 Période couverte : janvier 2026 → en cours
