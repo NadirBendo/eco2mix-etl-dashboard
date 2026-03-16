@@ -58,7 +58,7 @@ Power BI Dashboard
 ## Description des scripts
 
 ### `bootstrap.py`
-Extraction initiale des données depuis l'API eCO2mix. Récupère N lignes (paramétrable), les stocke dans SQLite avec un index unique sur `date_heure` pour garantir l'absence de doublons. Ne gère pas l'upload Google Sheets — délégué à `process_upload.py`.
+Extraction initiale des données depuis l'API eCO2mix. Récupère N lignes (paramétrable), les stocke dans SQLite avec un index unique sur `date_heure` pour garantir l'absence de doublons. Ne gère pas l'upload Google Sheets - délégué à `process_upload.py`.
 
 ### `extract.py`
 Mise à jour incrémentale de la base SQLite. Calcule automatiquement le delta entre le dernier timestamp en base et l'heure actuelle, puis récupère uniquement les lignes manquantes via l'API. Utilise un `INSERT OR REPLACE` avec gestion des conflits sur `date_heure`.
@@ -99,6 +99,7 @@ Top partenaires (import/export/volume), part des échanges dans la consommation 
 
 ## Insights principaux
 
+- **Production de nucléaire comparable à 81%** de la consommation nationale 
 - **~69% de nucléaire** dans le mix de production sur la période janvier–mars 2026.
 - **France exportatrice** : échanges avec les pays voisins à hauteur de ~19% de sa consommation, exportatrice nette vers l'Italie et l'Allemagne/Belgique.
 - **Corrélation nette** entre part d'énergies renouvelables et baisse de l'intensité carbone (gCO₂/kWh).
