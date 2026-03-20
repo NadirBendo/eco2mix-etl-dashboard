@@ -1,0 +1,33 @@
+name: Actualisation Google Sheets
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installation des dépendances
+        run: pip install requests pandas gspread google-auth python-dotenv
+
+      - name: Écriture du fichier .env
+        run: |
+          echo "GCP_TOKEN=credentials.json" >> pipeline/.env
+          echo "SHEET_ID=${{ secrets.SHEET_ID }}" >> pipeline/.env
+
+      - name: Écriture des credentials GCP
+        run: echo '${{ secrets.GCP_CREDENTIALS }}' > pipeline/credentials.json
+
+      - name: Lancement du script
+        run: python pipeline/no_store_process_upload.py
